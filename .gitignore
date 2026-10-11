@@ -1,0 +1,31 @@
+/vendor/
+/node_modules/
+/build/*.zip
+/build/tmp/
+# Where Joomla's CLI installer unpacks a package it was handed.
+/build/install_*/
+/.phpunit.cache/
+/.phpunit.result.cache
+/.php-cs-fixer.cache
+/composer.lock
+/.idea/
+/.vscode/
+/*.iml
+
+# The CommonMark library's own vendor tree. It is what the package ships, and it
+# is installed by `composer install` at the root (see composer.json), never
+# committed: a committed vendor tree is a second source of truth for versions.
+/src/library/yepr_commonmark/vendor/
+/src/library/yepr_commonmark/composer.lock
+
+# The development site: a real Joomla with its own database. See docs/development.md.
+/joomla/
+
+# Scratch: notes, dumps, anything personal kept beside the repo.
+/xdiv/
+
+# Cypress: the env file holds a login, and the rest is run output.
+/cypress.env.json
+/cypress/screenshots/
+/cypress/videos/
+/cypress/downloads/

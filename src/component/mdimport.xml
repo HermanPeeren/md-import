@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+	<name>com_mdimport</name>
+	<author>Herman Peeren</author>
+	<creationDate>2026-10</creationDate>
+	<copyright>Copyright (C) Yepr, Herman Peeren. All rights reserved.</copyright>
+	<license>GNU General Public License version 3 or later; see LICENSE.txt</license>
+	<authorEmail>herman@yepr.nl</authorEmail>
+	<authorUrl>https://yepr.nl</authorUrl>
+	<version>0.1.0</version>
+	<description>COM_MDIMPORT_XML_DESCRIPTION</description>
+	<namespace path="src">Yepr\Component\Mdimport</namespace>
+
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+	<uninstall>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file>
+		</sql>
+	</uninstall>
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
+	</update>
+
+	<media destination="com_mdimport" folder="media/com_mdimport">
+		<filename>joomla.asset.json</filename>
+		<folder>js</folder>
+	</media>
+
+	<administration>
+		<menu img="class:file-import">COM_MDIMPORT</menu>
+		<files folder="administrator/components/com_mdimport">
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+			<folder>language</folder>
+			<folder>services</folder>
+			<folder>sql</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+		</files>
+	</administration>
+</extension>

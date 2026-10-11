@@ -1,0 +1,55 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+    level: 6
+
+    paths:
+        - src/component/administrator/components/com_mdimport
+        - src/script.php
+        - tests
+        - tools
+        - build
+
+    # Joomla is reference material for the classes the component extends.
+    # Libraries only: /joomla here is a working site with this package
+    # installed in it, and scanning that would resolve classes CI cannot see.
+    scanDirectories:
+        - joomla/libraries
+        - joomla/administrator/components/com_content/src
+        - joomla/administrator/components/com_menus/src
+        - joomla/administrator/components/com_categories/src
+
+    excludePaths:
+        analyseAndScan:
+            # This package's own library, as installed into the development
+            # site. The copy in src/library is the one that counts.
+            - joomla/libraries/yepr_commonmark/*
+
+    scanFiles:
+        - src/library/yepr_commonmark/vendor/autoload.php
+
+    bootstrapFiles:
+        - tools/phpstan-bootstrap.php
+
+    treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        # Joomla's own shape, not this project's mistakes. Core writes each.
+        #
+        # A model's save() and a table's check() report failure by returning
+        # false and keeping the reason for getError(), and that is the only
+        # place the reason is, until 7.0 replaces the mechanism. com_content's
+        # own controllers read it the same way.
+        -
+            message: '#Call to deprecated method getError\(\) of class Joomla\\CMS\\(MVC\\Model\\BaseModel|Table\\Table)#'
+            paths:
+                - src/component/administrator/components/com_mdimport/src/Import/ContentWriter.php
+                - tools/seed-site.php
+
+        # A layout is included from inside HtmlView::display(), so `$this` is
+        # the view and its protected methods are in scope. The `@var` line that
+        # tells PHPStan what `$this` is cannot also tell it where it runs.
+        -
+            message: '#Call to protected method getDocument\(\) of class Joomla\\CMS\\MVC\\View\\AbstractView#'
+            path: src/component/administrator/components/com_mdimport/tmpl/*

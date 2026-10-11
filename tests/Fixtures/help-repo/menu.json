@@ -1,0 +1,12 @@
+{
+    "articles": {
+        "articles.md": "Articles: Introduction",
+        "articles-edit.md": "Articles: Edit",
+        "listed-but-missing.md": "A page menu.json lists that is not there"
+    },
+    "menu-items": {
+        "articles": {
+            "single-article.md": "Single Article"
+        }
+    }
+}

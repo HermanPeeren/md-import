@@ -1,0 +1,20 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "com_mdimport",
+  "version": "0.1.0",
+  "description": "MD Import",
+  "license": "GPL-3.0-or-later",
+  "assets": [
+    {
+      "name": "com_mdimport.import",
+      "type": "script",
+      "uri": "com_mdimport/import.js",
+      "dependencies": [
+        "core"
+      ],
+      "attributes": {
+        "type": "module"
+      }
+    }
+  ]
+}

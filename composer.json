@@ -1,0 +1,50 @@
+{
+    "name": "yepr/md-import",
+    "description": "MD Import: a Joomla component that imports the Jdocmanual help pages as articles, images and menu items",
+    "type": "joomla-component",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Herman Peeren",
+            "email": "herman@yepr.nl",
+            "homepage": "https://yepr.nl"
+        }
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpunit/phpunit": "^11.0",
+        "squizlabs/php_codesniffer": "^3.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Yepr\\Component\\Mdimport\\Administrator\\": "src/component/administrator/components/com_mdimport/src/",
+            "Yepr\\Component\\Mdimport\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": "@library",
+        "post-update-cmd": "@library",
+        "library": "@composer install --no-dev --no-progress --optimize-autoloader --working-dir=src/library/yepr_commonmark",
+        "test": "phpunit",
+        "analyse": "phpstan analyse",
+        "cs": "phpcs",
+        "update-xml": "php build/update-xml.php",
+        "build": [
+            "@update-xml",
+            "php build/build.php"
+        ],
+        "install-local": [
+            "@build",
+            "php tools/install-local.php"
+        ],
+        "cypress": "npx cypress run"
+    },
+    "config": {
+        "sort-packages": true,
+        "process-timeout": 0
+    }
+}

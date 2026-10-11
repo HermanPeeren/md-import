@@ -1,0 +1,1 @@
+-- The first version. Joomla reads this folder to learn the schema version.

@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<ruleset name="mdimport">
+	<description>PSR-12, minus what contradicts Joomla's own conventions.</description>
+
+	<file>src/component/administrator/components/com_mdimport</file>
+	<file>src/script.php</file>
+	<file>src/library/yepr_commonmark/autoload.php</file>
+	<file>tests</file>
+	<file>tools</file>
+	<file>build</file>
+
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/joomla/*</exclude-pattern>
+	<exclude-pattern>*/Fixtures/*</exclude-pattern>
+
+	<arg name="extensions" value="php"/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+
+	<rule ref="PSR12"/>
+
+	<!--
+		Every Joomla source file opens with `defined('_JEXEC') or die;`, which
+		PSR-1 calls a side effect. It is also mandatory: without it the file does
+		something when requested directly over the web. A tool and a build
+		script declare helpers and then do their work, which is what a script is.
+	-->
+	<rule ref="PSR1.Files.SideEffects">
+		<exclude-pattern>src/*</exclude-pattern>
+		<exclude-pattern>tools/*</exclude-pattern>
+		<exclude-pattern>build/*</exclude-pattern>
+	</rule>
+
+	<!-- Joomla names an install script class Pkg_NameInstallerScript, and finds it by that name. -->
+	<rule ref="Squiz.Classes.ValidClassName.NotCamelCaps">
+		<exclude-pattern>src/script.php</exclude-pattern>
+	</rule>
+	<rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+		<exclude-pattern>src/script.php</exclude-pattern>
+	</rule>
+
+	<!-- A layout mixes PHP and HTML, and the indentation follows the HTML. -->
+	<rule ref="Generic.WhiteSpace.ScopeIndent">
+		<exclude-pattern>*/tmpl/*</exclude-pattern>
+	</rule>
+
+	<rule ref="Generic.Files.LineLength">
+		<exclude-pattern>*/tmpl/*</exclude-pattern>
+		<properties>
+			<property name="lineLimit" value="180"/>
+			<property name="absoluteLineLimit" value="0"/>
+		</properties>
+	</rule>
+</ruleset>
