@@ -104,7 +104,7 @@ MD Import is GPL-3.0-or-later. league/commonmark and its dependencies keep
 their own licences (BSD-3-Clause and MIT).
 
 The help pages are published under the
-[Joomla! Electronic Documentation License (JEDL)](https://docs.joomla.org/JEDL),
+[Joomla! Electronic Documentation License (JEDL)](https://guide.joomla.org/contributors/jedl-license),
 which allows them to be republished. The source line that ends every imported
 article is how this component gives the attribution that licence asks for.
 

@@ -78,6 +78,7 @@ describe('importing', () => {
 
     // And the source line names where it came from.
     cy.get('.mdimport-attribution a[href="https://jdocmanual.org/en/jdocmanual?article=help/articles/articles"]').should('exist');
+    cy.get('.mdimport-attribution a[href="https://guide.joomla.org/contributors/jedl-license"]').should('exist');
   });
 
   it('nests a subsection under its section in the menu', () => {
