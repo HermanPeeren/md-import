@@ -153,6 +153,34 @@
 			filter="string"
 			required="true"
 		/>
+	</fieldset>
+
+	<fieldset name="links" label="COM_MDIMPORT_FIELDSET_LINKS" description="COM_MDIMPORT_FIELDSET_LINKS_DESC">
+		<field
+			name="user_guide_url"
+			type="text"
+			label="COM_MDIMPORT_FIELD_USER_GUIDE_URL_LABEL"
+			description="COM_MDIMPORT_FIELD_USER_GUIDE_URL_DESC"
+			default="/user-guide/"
+			filter="string"
+		/>
+		<field
+			name="help_pages_url"
+			type="text"
+			label="COM_MDIMPORT_FIELD_HELP_PAGES_URL_LABEL"
+			description="COM_MDIMPORT_FIELD_HELP_PAGES_URL_DESC"
+			default="/help-pages-references/"
+			filter="string"
+		/>
+		<field
+			name="source_url"
+			type="url"
+			label="COM_MDIMPORT_FIELD_SOURCE_URL_LABEL"
+			description="COM_MDIMPORT_FIELD_SOURCE_URL_DESC"
+			default="https://guide.joomla.org/help-pages-references/"
+			filter="url"
+			validate="url"
+		/>
 		<field
 			name="manual_base"
 			type="url"

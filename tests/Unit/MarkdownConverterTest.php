@@ -24,6 +24,7 @@ final class MarkdownConverterTest extends TestCase
         return new UrlResolver(
             static fn (string $slug): ?string => $articles[$slug] ?? null,
             'images/help',
+            ['user' => '/user-guide/', 'help' => '/help-pages-references/'],
             'https://jdocmanual.org/en/'
         );
     }
@@ -66,18 +67,18 @@ final class MarkdownConverterTest extends TestCase
         self::assertStringContainsString('href="index.php?option=com_content&amp;view=article&amp;id=1&amp;catid=9#column-headers"', $html);
     }
 
-    public function testALinkToAnotherManualGoesOnline(): void
+    public function testALinkToTheUserManualGoesToTheUserGuide(): void
     {
         $html = (new MarkdownConverter(new ConversionOptions()))->convert($this->fixturePage(), $this->resolver());
 
-        self::assertStringContainsString('href="https://jdocmanual.org/en/jdocmanual?article=user/articles/adding-an-image-to-an-article"', $html);
+        self::assertStringContainsString('href="/user-guide/articles/adding-an-image-to-an-article"', $html);
     }
 
-    public function testALinkToAPageThatWasNotImportedGoesOnline(): void
+    public function testALinkToAPageThatWasNotImportedGoesToThePublishedHelpPages(): void
     {
         $html = (new MarkdownConverter(new ConversionOptions()))->convert($this->fixturePage(), $this->resolver());
 
-        self::assertStringContainsString('href="https://jdocmanual.org/en/jdocmanual?article=help/nowhere/missing-page"', $html);
+        self::assertStringContainsString('href="/help-pages-references/nowhere/missing-page"', $html);
     }
 
     public function testAnImageGoesToTheImportedImagesFolder(): void

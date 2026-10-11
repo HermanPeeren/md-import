@@ -77,8 +77,15 @@ describe('importing', () => {
     cy.get('a[href*="jdocmanual?article=help/common-elements"]').should('not.exist');
 
     // And the source line names where it came from.
-    cy.get('.mdimport-attribution a[href="https://jdocmanual.org/en/jdocmanual?article=help/articles/articles"]').should('exist');
+    cy.get('.mdimport-attribution a[href="https://guide.joomla.org/help-pages-references/articles/articles"]')
+      .should('have.text', 'Joomla Help in the User Guide');
     cy.get('.mdimport-attribution a[href="https://guide.joomla.org/contributors/jedl-license"]').should('exist');
+  });
+
+  it('sends a link to the User Manual to the User Guide, keeping the rest of its address', () => {
+    cy.visit('/index.php/help/articles/articles-edit');
+    cy.get('a[href="/user-guide/articles/adding-an-image-to-an-article"]').should('exist');
+    cy.get('a[href*="jdocmanual"]').should('not.exist');
   });
 
   it('nests a subsection under its section in the menu', () => {

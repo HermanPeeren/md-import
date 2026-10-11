@@ -10,6 +10,8 @@ use Yepr\Component\Mdimport\Administrator\Markdown\UrlResolver;
 
 final class UrlResolverTest extends TestCase
 {
+    private const BASES = ['user' => '/user-guide/', 'help' => '/help-pages-references/'];
+
     /**
      * @return array<string, array{string, ?string}>
      */
@@ -33,22 +35,22 @@ final class UrlResolverTest extends TestCase
     }
 
     /**
-     * @return array<string, array{string, ?array{0: string, 1: string, 2: string}}>
+     * @return array<string, array{string, ?array{0: string, 1: string, 2: string, 3: string}}>
      */
     public static function links(): array
     {
         return [
-            'help page'            => ['jdocmanual?article=help/common-elements/toolbars', ['help', 'toolbars', '']],
-            'with a fragment'      => ['jdocmanual?article=help/articles/articles#tips', ['help', 'articles', 'tips']],
-            'another manual'       => ['jdocmanual?article=user/users/access-control', ['user', 'access-control', '']],
-            'the site itself'      => ['https://jdocmanual.org/en/jdocmanual?article=help/a/b', ['help', 'b', '']],
+            'help page'            => ['jdocmanual?article=help/common-elements/toolbars', ['help', 'toolbars', '', 'common-elements/toolbars']],
+            'with a fragment'      => ['jdocmanual?article=help/articles/articles#tips', ['help', 'articles', 'tips', 'articles/articles']],
+            'another manual'       => ['jdocmanual?article=user/users/access-control', ['user', 'access-control', '', 'users/access-control']],
+            'the site itself'      => ['https://jdocmanual.org/en/jdocmanual?article=help/a/b', ['help', 'b', '', 'a/b']],
             'an ordinary link'     => ['https://www.joomla.org', null],
             'an anchor'            => ['#top', null],
         ];
     }
 
     /**
-     * @param   array{0: string, 1: string, 2: string}|null  $expected
+     * @param   array{0: string, 1: string, 2: string, 3: string}|null  $expected
      */
     #[DataProvider('links')]
     public function testManualLinks(string $url, ?array $expected): void
@@ -58,16 +60,33 @@ final class UrlResolverTest extends TestCase
 
     public function testOrdinaryLinksAreLeftAlone(): void
     {
-        $resolver = new UrlResolver(static fn (): ?string => null, 'images/help', 'https://jdocmanual.org/en/');
+        $resolver = new UrlResolver(static fn (): ?string => null, 'images/help', self::BASES, 'https://jdocmanual.org/en/');
 
         self::assertSame('https://www.joomla.org', $resolver->link('https://www.joomla.org'));
         self::assertSame('#top', $resolver->link('#top'));
         self::assertSame('mailto:x@example.org', $resolver->link('mailto:x@example.org'));
     }
 
+    public function testALinkIntoAnotherManualKeepsTheRestOfItsAddress(): void
+    {
+        $resolver = new UrlResolver(static fn (): ?string => null, 'images/help', self::BASES, 'https://jdocmanual.org/en/');
+
+        self::assertSame('/user-guide/users/access-control', $resolver->link('jdocmanual?article=user/users/access-control'));
+        self::assertSame('/user-guide/users/access-control#groups', $resolver->link('jdocmanual?article=user/users/access-control#groups'));
+        self::assertSame('/help-pages-references/common-elements/toolbars', $resolver->link('jdocmanual?article=help/common-elements/toolbars'));
+    }
+
+    public function testAManualWithoutAnAddressGoesToTheOnlineJdocmanual(): void
+    {
+        $resolver = new UrlResolver(static fn (): ?string => null, 'images/help', ['user' => ''], 'https://jdocmanual.org/en/');
+
+        self::assertSame('https://jdocmanual.org/en/jdocmanual?article=user/users/access-control', $resolver->link('jdocmanual?article=user/users/access-control'));
+        self::assertSame('https://jdocmanual.org/en/jdocmanual?article=dev/a/b', $resolver->link('jdocmanual?article=dev/a/b'));
+    }
+
     public function testTheImageBaseIsNormalised(): void
     {
-        $resolver = new UrlResolver(static fn (): ?string => null, '/images/help/', 'https://jdocmanual.org/en/');
+        $resolver = new UrlResolver(static fn (): ?string => null, '/images/help/', self::BASES, 'https://jdocmanual.org/en/');
 
         self::assertSame('images/help/a/b.png', $resolver->image('../en/images/a/b.png'));
     }

@@ -18,10 +18,12 @@ namespace Yepr\Component\Mdimport\Administrator\Markdown;
  *
  *  - `jdocmanual?article=help/<section>/<slug>#fragment` - another help page.
  *    It is resolved by slug, which is unique across the manual, to the
- *    imported article. A slug that was not imported (a page that has since
- *    been removed) goes to the online manual instead, so it still works.
- *  - `jdocmanual?article=user/...` and other manuals - not imported, so they
- *    go to the online manual.
+ *    imported article.
+ *  - `jdocmanual?article=<manual>/<rest>` for anything that was not imported:
+ *    another manual (`user/...`, the User Manual), or a help page that is not
+ *    in this import. It goes to where that manual is published, given per
+ *    manual: `user/articles/x` becomes `<user base>articles/x`. A manual with
+ *    no base of its own goes to the online Jdocmanual.
  *  - `../../../en/images/<path>` - an image in the repository. It goes to where
  *    the import copied it.
  *
@@ -30,14 +32,16 @@ namespace Yepr\Component\Mdimport\Administrator\Markdown;
 final class UrlResolver
 {
     /**
-     * @param   callable(string): ?string  $articleUrl  slug => URL of the imported article, or null
-     * @param   string                     $imageBase   Site-relative folder the images were copied to, e.g. `images/help`
-     * @param   string                     $manualBase  Where the online manual lives, e.g. `https://jdocmanual.org/en/`
+     * @param   callable(string): ?string  $articleUrl   slug => URL of the imported article, or null
+     * @param   string                     $imageBase    Site-relative folder the images were copied to, e.g. `images/help`
+     * @param   array<string, string>      $manualBases  manual => where it is published, e.g. `user` => `/user-guide/`
+     * @param   string                     $jdocmanual   The online Jdocmanual, for a manual not in $manualBases
      */
     public function __construct(
         private $articleUrl,
         private readonly string $imageBase,
-        private readonly string $manualBase
+        private readonly array $manualBases,
+        private readonly string $jdocmanual
     ) {
     }
 
@@ -55,17 +59,24 @@ final class UrlResolver
             return self::repositoryImage($url) !== null ? $this->image($url) : $url;
         }
 
-        [$manual, $slug, $fragment] = $parsed;
+        [$manual, $slug, $fragment, $rest] = $parsed;
+        $fragment                          = $fragment !== '' ? '#' . $fragment : '';
 
         if ($manual === 'help' && $slug !== '') {
             $local = ($this->articleUrl)($slug);
 
             if ($local !== null) {
-                return $local . ($fragment !== '' ? '#' . $fragment : '');
+                return $local . $fragment;
             }
         }
 
-        return rtrim($this->manualBase, '/') . '/' . ltrim(substr($url, (int) strpos($url, 'jdocmanual')), '/');
+        $base = trim($this->manualBases[$manual] ?? '');
+
+        if ($base !== '') {
+            return rtrim($base, '/') . '/' . $rest . $fragment;
+        }
+
+        return rtrim($this->jdocmanual, '/') . '/jdocmanual?article=' . $manual . '/' . $rest . $fragment;
     }
 
     public function image(string $url): string
@@ -80,9 +91,12 @@ final class UrlResolver
     }
 
     /**
-     * The manual, slug and fragment of a Jdocmanual link, or null for any other URL.
+     * The manual, slug, fragment and the path after the manual of a Jdocmanual
+     * link, or null for any other URL.
      *
-     * @return array{0: string, 1: string, 2: string}|null
+     * `jdocmanual?article=user/articles/x#y` is `['user', 'x', 'y', 'articles/x']`.
+     *
+     * @return array{0: string, 1: string, 2: string, 3: string}|null
      */
     public static function manualLink(string $url): ?array
     {
@@ -90,9 +104,10 @@ final class UrlResolver
             return null;
         }
 
-        $parts = explode('/', trim($m[2], '/'));
+        $rest  = trim($m[2], '/');
+        $parts = explode('/', $rest);
 
-        return [strtolower($m[1]), (string) end($parts), $m[3] ?? ''];
+        return [strtolower($m[1]), (string) end($parts), $m[3] ?? '', $rest];
     }
 
     /**

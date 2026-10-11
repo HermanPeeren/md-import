@@ -26,8 +26,10 @@ For the English manual, around 280 articles, 520 images and 330 menu items:
 - **Menu items** under a menu item you choose: a heading per section, and a
   Single Article item per page, in the manual's own order.
 - **Links between pages** point at the imported articles, so they use the menu
-  items' URLs. Links to the other manuals (the User Manual, for one) go to
-  jdocmanual.org.
+  items' URLs. Links to the User Manual go to `/user-guide/…`, and links to a
+  help page that is not imported to `/help-pages-references/…`, keeping the rest
+  of the address: `jdocmanual?article=user/users/access-control` becomes
+  `/user-guide/users/access-control`. Both are options.
 
 Importing again updates what was imported before; it does not make copies.
 An article whose text has not changed is not saved again. Articles or menu
@@ -68,7 +70,9 @@ It needs Joomla 5 or 6 and PHP 8.1 or later, with the zip extension.
 | | Imported Before: update or skip | Update |
 | | Source Line | yes |
 | Source | Owner, Repository, Branch or Tag | `ceford`, `cefjdemos-data-jdm-help-en`, `2.0` |
-| | Online Manual | `https://jdocmanual.org/en/` |
+| Links | User Guide, Help Pages | `/user-guide/`, `/help-pages-references/` |
+| | Source Line Address | `https://guide.joomla.org/help-pages-references/` |
+| | Online Jdocmanual, for any other manual | `https://jdocmanual.org/en/` |
 | Markdown | Flavour: CommonMark or GitHub-Flavoured | GitHub-Flavoured |
 | | HTML Input: allow, escape, strip | Allow |
 | | Allow Unsafe Links; Maximum Nesting Level | no; 0 (no limit) |

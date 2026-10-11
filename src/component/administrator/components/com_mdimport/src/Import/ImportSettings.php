@@ -22,11 +22,23 @@ final class ImportSettings
     public const SECTION_CATEGORY_LIST = 'category_list';
     public const SECTION_CATEGORY_BLOG = 'category_blog';
 
+    /** Where links to the User Manual go: the User Guide on guide.joomla.org. */
+    public const USER_GUIDE = '/user-guide/';
+
+    /** Where links to a help page that was not imported go. */
+    public const HELP_PAGES = '/help-pages-references/';
+
+    /** Where each page is published, for the source line. */
+    public const SOURCE = 'https://guide.joomla.org/help-pages-references/';
+
     public function __construct(
         public readonly string $owner,
         public readonly string $repository,
         public readonly string $branch,
         public readonly string $manualBase,
+        public readonly string $userGuideUrl,
+        public readonly string $helpPagesUrl,
+        public readonly string $sourceBase,
         public readonly int $parentMenuItem,
         public readonly string $sectionMenuType,
         public readonly string $imagesFolder,
@@ -65,6 +77,9 @@ final class ImportSettings
             self::name((string) ($params['source_repository'] ?? 'cefjdemos-data-jdm-help-en'), 'cefjdemos-data-jdm-help-en'),
             self::ref((string) ($params['source_branch'] ?? '2.0')),
             trim((string) ($params['manual_base'] ?? '')) ?: 'https://jdocmanual.org/en/',
+            trim((string) ($params['user_guide_url'] ?? self::USER_GUIDE)),
+            trim((string) ($params['help_pages_url'] ?? self::HELP_PAGES)),
+            trim((string) ($params['source_url'] ?? '')) ?: self::SOURCE,
             (int) ($params['parent_menu_item'] ?? 0),
             $sectionMenuType,
             self::folder((string) ($params['images_folder'] ?? '')),
@@ -105,12 +120,24 @@ final class ImportSettings
     }
 
     /**
-     * A page's address in the online manual, for the attribution line.
+     * Where links into each manual go when they do not point at an imported
+     * article: `user` => the User Guide, `help` => the published help pages.
+     * A manual left empty goes to the online Jdocmanual.
+     *
+     * @return array<string, string>
      */
-    public function onlineUrl(string $sectionPath, string $slug): string
+    public function manualBases(): array
     {
-        // Nested sections keep their slash: help/menu-items/articles/single-article.
-        return rtrim($this->manualBase, '/') . '/jdocmanual?article=help/' . $sectionPath . '/' . $slug;
+        return ['user' => $this->userGuideUrl, 'help' => $this->helpPagesUrl];
+    }
+
+    /**
+     * Where a page is published, for the source line.
+     */
+    public function sourceUrl(string $sectionPath, string $slug): string
+    {
+        // Nested sections keep their slash: menu-items/articles/single-article.
+        return rtrim($this->sourceBase, '/') . '/' . $sectionPath . '/' . $slug;
     }
 
     private static function name(string $value, string $default): string

@@ -307,6 +307,7 @@ final class Importer
                 );
             },
             $this->settings->imageBase(),
+            $this->settings->manualBases(),
             $this->settings->manualBase
         );
 
@@ -327,7 +328,7 @@ final class Importer
 
             if ($this->settings->attribution) {
                 $html .= "\n" . '<p class="mdimport-attribution"><small>'
-                    . Text::sprintf('COM_MDIMPORT_ATTRIBUTION', htmlspecialchars($this->settings->onlineUrl($page->sectionPath, $page->slug), ENT_QUOTES))
+                    . Text::sprintf('COM_MDIMPORT_ATTRIBUTION', htmlspecialchars($this->settings->sourceUrl($page->sectionPath, $page->slug), ENT_QUOTES))
                     . '</small></p>' . "\n";
             }
 

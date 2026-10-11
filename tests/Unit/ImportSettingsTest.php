@@ -76,11 +76,21 @@ final class ImportSettingsTest extends TestCase
         self::assertTrue(ImportSettings::fromParams(['on_existing' => 'anything'])->updateExisting);
     }
 
-    public function testTheOnlinePageKeepsANestedSectionsSlash(): void
+    public function testTheSourceLinePointsAtThePublishedPage(): void
     {
         self::assertSame(
-            'https://jdocmanual.org/en/jdocmanual?article=help/menu-items/articles/single-article',
-            ImportSettings::fromParams([])->onlineUrl('menu-items/articles', 'single-article')
+            'https://guide.joomla.org/help-pages-references/articles/articles',
+            ImportSettings::fromParams([])->sourceUrl('articles', 'articles')
         );
+        self::assertSame(
+            'https://guide.joomla.org/help-pages-references/menu-items/articles/single-article',
+            ImportSettings::fromParams([])->sourceUrl('menu-items/articles', 'single-article')
+        );
+    }
+
+    public function testLinksIntoOtherManualsGoToTheGuideByDefault(): void
+    {
+        self::assertSame(['user' => '/user-guide/', 'help' => '/help-pages-references/'], ImportSettings::fromParams([])->manualBases());
+        self::assertSame('', ImportSettings::fromParams(['user_guide_url' => ''])->manualBases()['user']);
     }
 }
