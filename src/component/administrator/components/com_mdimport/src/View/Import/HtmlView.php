@@ -51,11 +51,13 @@ final class HtmlView extends BaseHtmlView
         $this->lastImport = $model->map()->lastImport();
         $this->canImport  = Factory::getApplication()->getIdentity()->authorise('mdimport.import', 'com_mdimport');
 
+        // Building the importer loads CommonMark, so without the library there
+        // is no importer to ask - and that is the one problem worth reporting.
         if (!ImportModel::commonMarkAvailable()) {
             $this->problems[] = Text::_('COM_MDIMPORT_PROBLEM_NO_LIBRARY');
+        } else {
+            $this->problems = $model->importer()->problems();
         }
-
-        $this->problems = array_merge($this->problems, $model->importer()->problems());
 
         $this->parentMenuItemTitle = $this->title('#__menu', $this->settings->parentMenuItem);
         $this->parentCategoryTitle = $this->settings->parentCategory > 0

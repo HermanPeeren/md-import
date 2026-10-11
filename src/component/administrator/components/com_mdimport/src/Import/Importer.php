@@ -55,6 +55,7 @@ final class Importer
         private readonly ItemMap $map,
         private readonly ContentWriter $writer,
         private readonly Downloader $downloader,
+        private readonly MarkdownConverter $converter,
         private readonly string $workDirectory,
         private readonly string $siteRoot
     ) {
@@ -292,7 +293,6 @@ final class Importer
     {
         $pages     = $this->repository()->pages();
         $total     = \count($pages);
-        $converter = new MarkdownConverter($this->settings->conversion);
         $bySlug    = $this->map->pagesBySlug();
         $resolver  = new UrlResolver(
             static function (string $slug) use ($bySlug): ?string {
@@ -323,7 +323,7 @@ final class Importer
             }
 
             $parsed = PageParser::parse($this->repository()->read($page));
-            $html   = $converter->convert($parsed->markdown, $resolver);
+            $html   = $this->converter->convert($parsed->markdown, $resolver);
 
             if ($this->settings->attribution) {
                 $html .= "\n" . '<p class="mdimport-attribution"><small>'

@@ -17,6 +17,7 @@ src/
       src/Source/               reads a Jdocmanual repository: sections, pages, images
       src/Markdown/             CommonMark conversion, and where links and images go
       src/Import/               the import: settings, download, mapping table, writers, steps
+      src/Service/              the MVC factory, and the providers that build the services
       src/{Controller,Model,View}/  one screen, one JSON task
       tmpl/ language/ services/ sql/
     media/com_mdimport/js/import.js   drives the steps
@@ -31,6 +32,41 @@ tools/                          install-local.php, seed-site.php, phpstan-bootst
 `Source/` and `Markdown/` do not touch Joomla, and the unit tests cover them
 against the fixture. `Import/` writes through Joomla's own models, so only
 Cypress can say whether it works.
+
+## Services, and how the MVC classes get them
+
+The import's services are registered in `src/Service/Provider/Import.php`, and
+nothing else in the component constructs one:
+
+| Service | Built from |
+|---|---|
+| `ImportSettings` | the component's options |
+| `ItemMap` | the database |
+| `ContentWriter` | the application and the database |
+| `Downloader` | Joomla's CA bundle |
+| `MarkdownConverter` | the settings' conversion options, after loading lib_yepr_commonmark |
+| `Importer` | all of the above, the tmp folder and the site root |
+
+Each is shared and built the first time something asks for it.
+
+Joomla builds controllers and models itself, with the constructors Joomla
+decides, so they get services the way core hands over the database: the class
+implements an `*AwareInterface`, usually with the matching trait, and the
+component's MVC factory (`Service\MVCFactory`, a subclass of Joomla's,
+registered by `Service\Provider\MVCFactory` in place of Joomla's provider)
+hands the service over after building it. This is the same pattern as in
+Exten-gen. `ImportModel` declares all three: settings, item map and importer.
+
+The importer is handed over as a closure that fetches it, not as the importer
+itself. Building it loads CommonMark, and the import screen has to open and
+report a missing library without loading it.
+
+`ServiceConstructionTest` reads the source. It fails on a construction of
+one of these services anywhere but the provider, and on any `new` in a
+controller, model, view or layout, apart from exceptions and Joomla's
+`JsonResponse`. What the importer still makes for itself is per-run values:
+the `HelpRepository` over this download and the `UrlResolver` over this run's
+articles.
 
 ## The library's vendor tree
 

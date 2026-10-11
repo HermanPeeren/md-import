@@ -11,51 +11,44 @@ namespace Yepr\Component\Mdimport\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-use Joomla\Database\DatabaseInterface;
-use Yepr\Component\Mdimport\Administrator\Import\ContentWriter;
-use Yepr\Component\Mdimport\Administrator\Import\Downloader;
 use Yepr\Component\Mdimport\Administrator\Import\Importer;
+use Yepr\Component\Mdimport\Administrator\Import\ImporterAwareInterface;
+use Yepr\Component\Mdimport\Administrator\Import\ImporterAwareTrait;
 use Yepr\Component\Mdimport\Administrator\Import\ImportSettings;
+use Yepr\Component\Mdimport\Administrator\Import\ImportSettingsAwareInterface;
+use Yepr\Component\Mdimport\Administrator\Import\ImportSettingsAwareTrait;
 use Yepr\Component\Mdimport\Administrator\Import\ItemMap;
+use Yepr\Component\Mdimport\Administrator\Import\ItemMapAwareInterface;
+use Yepr\Component\Mdimport\Administrator\Import\ItemMapAwareTrait;
+use Yepr\Component\Mdimport\Administrator\Service\Provider\Import;
 
 /**
- * Puts the importer together from the component's options and the site, and
- * tells the screen what it needs to show.
+ * What the import screen and the import task need, as the component's MVC
+ * factory hands it over: the settings, the item map and the importer.
  */
-final class ImportModel extends BaseDatabaseModel
+final class ImportModel extends BaseDatabaseModel implements
+    ImportSettingsAwareInterface,
+    ItemMapAwareInterface,
+    ImporterAwareInterface
 {
-    private ?ItemMap $map = null;
+    use ImportSettingsAwareTrait;
+    use ItemMapAwareTrait;
+    use ImporterAwareTrait;
 
     public function settings(): ImportSettings
     {
-        return ImportSettings::fromParams(ComponentHelper::getParams('com_mdimport')->toArray());
-    }
-
-    public function importer(): Importer
-    {
-        self::loadCommonMark();
-
-        $app = Factory::getApplication();
-        $db  = Factory::getContainer()->get(DatabaseInterface::class);
-
-        return new Importer(
-            $this->settings(),
-            $this->map(),
-            new ContentWriter($app, $db),
-            // Joomla's own CA bundle, for the hosts - WAMP among them - whose
-            // PHP has none configured and fails every https request without it.
-            new Downloader(JPATH_LIBRARIES . '/vendor/composer/ca-bundle/res/cacert.pem'),
-            rtrim((string) $app->get('tmp_path', JPATH_ROOT . '/tmp'), '/\\') . '/mdimport',
-            JPATH_ROOT
-        );
+        return $this->getImportSettings();
     }
 
     public function map(): ItemMap
     {
-        return $this->map ??= new ItemMap(Factory::getContainer()->get(DatabaseInterface::class));
+        return $this->getItemMap();
+    }
+
+    public function importer(): Importer
+    {
+        return $this->getImporter();
     }
 
     /**
@@ -63,20 +56,6 @@ final class ImportModel extends BaseDatabaseModel
      */
     public static function commonMarkAvailable(): bool
     {
-        return is_file(JPATH_LIBRARIES . '/yepr_commonmark/autoload.php');
-    }
-
-    /**
-     * league/commonmark, from lib_yepr_commonmark.
-     */
-    public static function loadCommonMark(): void
-    {
-        if (!self::commonMarkAvailable()) {
-            throw new \RuntimeException('The library lib_yepr_commonmark is not installed. Install the MD Import package again: it carries the library.');
-        }
-
-        $autoload = JPATH_LIBRARIES . '/yepr_commonmark/autoload.php';
-
-        require_once $autoload;
+        return is_file(JPATH_LIBRARIES . Import::COMMONMARK);
     }
 }
