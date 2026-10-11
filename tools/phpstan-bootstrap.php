@@ -15,6 +15,6 @@ declare(strict_types=1);
 \define('JPATH_BASE', '');
 // The repository's library folder mirrors a site's libraries/ folder.
 \define('JPATH_LIBRARIES', __DIR__ . '/../src/library');
-\define('JVERSION', '6.1.3');
+\define('JVERSION', '6.1.4');
 
 require_once __DIR__ . '/../src/library/yepr_commonmark/vendor/autoload.php';
