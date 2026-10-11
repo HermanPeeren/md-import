@@ -13,6 +13,7 @@
 		<downloads>
 			<downloadurl type="full" format="zip">https://github.com/HermanPeeren/md-import/releases/download/v0.1.1/pkg_mdimport-0.1.1.zip</downloadurl>
 		</downloads>
+		<sha512>e43c381a9019f73669d04bca0dcb7918295be86d60f5708a36cd1ea858c744ccc28227d2c4e3a0c580422f5fd892143dc4174e4b44b3b9d946d0197c914624f4</sha512>
 		<maintainer>Herman Peeren</maintainer>
 		<maintainerurl>https://yepr.nl</maintainerurl>
 		<targetplatform name="joomla" version="(5|6)\..*"/>
